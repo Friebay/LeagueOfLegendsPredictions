@@ -9,6 +9,7 @@ username = "x"
 
 api_key = input("Enter your API key: ")
 username = input("Enter your username: ")
+username = username.replace(" ", "%20")
 
 api_AccountURL = "https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + username
 

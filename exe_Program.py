@@ -8,7 +8,10 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
-df = pd.read_csv('Friskis1_team_data.csv')
+username = input("Enter your username: ")
+username = username.replace(" ", "%20")
+
+df = pd.read_csv(username + '_team_data.csv')
 
 #We will first set the complete DataFrames
 x_keep_original = ['Gold', 'Level', 'Minions', 'Kills', 'Assists', 'Deaths', 'Towers', 'Dragons', 'Heralds', 'Gold_diff']
