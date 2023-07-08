@@ -38,7 +38,7 @@ for _ in range(2):
     
 
     for _ in tqdm(range(100), desc="Gathering 100 matches", unit="seconds"):
-        time.sleep(1.2 + random.uniform(0.1, 0.5))
+        time.sleep(1.2 + random.uniform(0.05, 0.5))
 
     # Initialize combined_data for each iteration
     combined_data = []
@@ -51,7 +51,7 @@ for _ in range(2):
     match_ids = responseMatchHistory.json()
 
     for _ in tqdm(range(100), desc="Extracting match info", unit="seconds"):
-        time.sleep(1.2 + random.uniform(0.1, 0.5))
+        time.sleep(1.2 + random.uniform(0.05, 0.5))
 
     for i in range(50):
         api_MatchData = "https://europe.api.riotgames.com/lol/match/v5/matches/" + match_ids[i] + '?api_key=' + api_key
