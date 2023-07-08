@@ -3,6 +3,7 @@ import time
 import requests
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 
 api_key = "x"
 username = "x"
@@ -10,6 +11,7 @@ username = "x"
 api_key = input("Enter your API key: ")
 username = input("Enter your username: ")
 username = username.replace(" ", "%20")
+print()
 
 api_AccountURL = "https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + username
 
@@ -32,7 +34,9 @@ n=0
 
 # Perform the loop 2 times for 100 matches
 for _ in range(2):
-    time.sleep(130)
+    
+    for _ in tqdm(range(100), desc="Gathering 100 matches", unit="seconds"):
+        time.sleep(1.3)
 
     # Initialize combined_data for each iteration
     combined_data = []
@@ -44,7 +48,8 @@ for _ in range(2):
     responseMatchHistory = requests.get(api_MatchHistoryAPI)
     match_ids = responseMatchHistory.json()
 
-    time.sleep(130)
+    for _ in tqdm(range(100), desc="Extracting match info'", unit="seconds"):
+        time.sleep(1.3)
 
     for i in range(50):
         api_MatchData = "https://europe.api.riotgames.com/lol/match/v5/matches/" + match_ids[i] + '?api_key=' + api_key
@@ -84,11 +89,10 @@ for _ in range(2):
             team_1["Gold_diff"] = team_1["Gold"] - team_2["Gold"]
             team_2["Gold_diff"] = team_2["Gold"] - team_1["Gold"]
             
-            #The rest of the info is not available in the minute 14 data, so it has to be scarped minute by minute that why we iterate from 1 to 14
-            for i in range(1, 15):
+            #The rest of the info is not available in the minute 14 data, so it has to be taken minute by minute
 
                     #For each minute a list of events its presented, so we can iterate through each event and get necessary info
-                            for j in match_timeline["info"]["frames"][i]["events"]:
+            for j in match_timeline["info"]["frames"][i]["events"]:
 
                                 #Get Kills, deaths and assists. Each event has a KillerID. 
                                 #If the Killer ID is between 1 and 5 is corresponds to team1, if its bigger than 5 is for team2. This pattern is repeated through out the iteration of events
@@ -191,7 +195,8 @@ for _ in range(2):
     # Update StartNumber and EndNumber for the next iteration
     StartNumber += 50
     n=n+1
-    print("loop", n)
+    print("Loop", n)
+    print()
 
     # Save the combined data to a CSV file
     combined_df = pd.DataFrame(combined_data)
