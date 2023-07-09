@@ -6,9 +6,6 @@ import numpy as np
 from tqdm import tqdm
 import random
 
-api_key = "x"
-username = "x"
-
 api_key = input("Enter your API key: ")
 username = input("Enter your username: ")
 username = username.replace(" ", "%20")
@@ -38,7 +35,7 @@ for _ in range(2):
     
 
     for _ in tqdm(range(100), desc="Gathering 100 matches", unit="seconds"):
-        time.sleep(1.2 + random.uniform(0.05, 0.5))
+        time.sleep(1.2 + random.uniform(0.005, 0.3))
 
     # Initialize combined_data for each iteration
     combined_data = []
@@ -51,7 +48,7 @@ for _ in range(2):
     match_ids = responseMatchHistory.json()
 
     for _ in tqdm(range(100), desc="Extracting match info", unit="seconds"):
-        time.sleep(1.2 + random.uniform(0.05, 0.5))
+        time.sleep(1.2 + random.uniform(0.005, 0.3))
 
     for i in range(50):
         api_MatchData = "https://europe.api.riotgames.com/lol/match/v5/matches/" + match_ids[i] + '?api_key=' + api_key
@@ -64,8 +61,8 @@ for _ in range(2):
 
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 840 and match_data["info"]["gameDuration"] <=7200:
 
-            team_1 = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0}
-            team_2 = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0}
+            team_1 = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Sight_wards": 0, "Control_wards": 0}
+            team_2 = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Sight_wards": 0, "Control_wards": 0}
 
             frame_index = min(14, len(match_timeline["info"]["frames"]) - 1)
 
@@ -83,7 +80,7 @@ for _ in range(2):
                     team_2["Gold"] += participant_frame["totalGold"]
                     team_2["Level"] += participant_frame["level"]
                     team_2["Minions"] += participant_frame["minionsKilled"]
-                    team_2["Jungle_minions"] += participant_frame["jungleMinionsKilled"]
+                    team_2["Minions"] += participant_frame["jungleMinionsKilled"]
 
             team_1["Level"] /= 5
             team_2["Level"] /= 5
@@ -91,44 +88,62 @@ for _ in range(2):
             team_1["Gold_diff"] = team_1["Gold"] - team_2["Gold"]
             team_2["Gold_diff"] = team_2["Gold"] - team_1["Gold"]
             
-            #The rest of the info is not available in the minute 14 data, so it has to be taken minute by minute
-            #For each minute a list of events its presented, so we can iterate through each event and get necessary info
-            for j in match_timeline["info"]["frames"][i]["events"]:
+            #The rest of the info is not available in the minute 14 data, so it has to be scarped minute by minute that why we iterate from 1 to 14
+            for i in range(1, 15):
 
-            #Get Kills, deaths and assists. Each event has a KillerID. 
-            #If the Killer ID is between 1 and 5 is corresponds to team1, if its bigger than 5 is for team2. This pattern is repeated through out the iteration of events
-                if (j["type"] == "CHAMPION_KILL") and (1 <= j["killerId"] <= 5):
-                    team_1["Kills"] += 1
-                    team_2["Deaths"] += 1
-                    try:
-                        team_1["Assists"] += len(j["assistingParticipantIds"])
-                    except:
-                        pass
-                    if (j["type"] == "CHAMPION_KILL") and (j["killerId"] > 5):
-                        team_2["Kills"] += 1
-                        team_1["Deaths"] += 1
-                        try:
-                            team_2["Assists"] += len(j["assistingParticipantIds"])
-                        except:
-                            pass
+                    #For each minute a list of events its presented, so we can iterate through each event and get necessary info
+                            for j in match_timeline["info"]["frames"][i]["events"]:
+
+                                #If the Killer ID is between 1 and 5 is corresponds to team1, if its bigger than 5 is for team2. This pattern is repeated through out the iteration of events
+                                if (j["type"] == "CHAMPION_KILL") and (1 <= j["killerId"] <= 5):
+                                    team_1["Kills"] += 1
+                                    team_2["Deaths"] += 1
+                                    try:
+                                        team_1["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                if (j["type"] == "CHAMPION_KILL") and (j["killerId"] > 5):
+                                    team_2["Kills"] += 1
+                                    team_1["Deaths"] += 1
+                                    try:
+                                        team_2["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                
+                                #Get Turret plates destroyed
+                                if (j["type"] == "TURRET_PLATE_DESTROYED") and (1 <= j["killerId"] <= 5):
+                                    team_1["Plates"] += 1
+                                if (j["type"] == "TURRET_PLATE_DESTROYED") and (j["killerId"] > 5):
+                                    team_2["Plates"] += 1
                                     
-                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 200):
-                    team_1["Towers"] += 1
-                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 100):
-                    team_2["Towers"] += 1
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 200):
+                                    team_1["Towers"] += 1
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 100):
+                                    team_2["Towers"] += 1 
                                 
                                 #Get Dragons and Heralds
-                if (j["type"] == "ELITE_MONSTER_KILL") and (1 <= j["killerId"] <= 5):
-                    if j["monsterType"] == "DRAGON":
-                        team_1["Dragons"] += 1
-                    elif j["monsterType"] == "RIFTHERALD":
-                        team_1["Heralds"] += 1
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (1 <= j["killerId"] <= 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_1["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_1["Heralds"] += 1
                                     
-                if (j["type"] == "ELITE_MONSTER_KILL") and (j["killerId"] > 5):
-                    if j["monsterType"] == "DRAGON":
-                            team_2["Dragons"] += 1
-                    elif j["monsterType"] == "RIFTHERALD":
-                        team_2["Heralds"] += 1
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (j["killerId"] > 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_2["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_2["Heralds"] += 1                
+                                
+                                #Get wards placed
+                                if (j["type"] == "WARD_PLACED" and j["wardType"] == "CONTROL_WARD") and (1 <= j["creatorId"] <= 5):
+                                    team_1["Control_wards"] += 1
+                                if (j["type"] == "WARD_PLACED" and j["wardType"] == "CONTROL_WARD") and (j["creatorId"] > 5):
+                                    team_2["Control_wards"] += 1
+                                    
+                                if (j["type"] == "WARD_PLACED" and (j["wardType"] == "SIGHT_WARD" or j["wardType"] == "YELLOW_TRINKET")) and (1 <= j["creatorId"] <= 5):
+                                    team_1["Sight_wards"] += 1
+                                if (j["type"] == "WARD_PLACED" and (j["wardType"] == "SIGHT_WARD" or j["wardType"] == "YELLOW_TRINKET")) and (j["creatorId"] > 5):
+                                    team_2["Sight_wards"] += 1
 
             if match_data["info"]["teams"][0]["win"]:
                 team_1["Win"] = 1
@@ -144,9 +159,12 @@ for _ in range(2):
                 'Kills': team_1["Kills"],
                 'Assists': team_1["Assists"],
                 'Deaths': team_1["Deaths"],
+                'Plates': team_1["Plates"],
                 'Towers': team_1["Towers"],
                 'Dragons': team_1["Dragons"],
                 'Heralds': team_1["Heralds"],
+                'Sight_wards': team_1["Sight_wards"],
+                'Control_wards': team_1["Control_wards"],
                 'Gold_diff': team_1["Gold_diff"],
                 'Win': team_1["Win"]
             }
@@ -158,9 +176,12 @@ for _ in range(2):
                 'Kills': team_2["Kills"],
                 'Assists': team_2["Assists"],
                 'Deaths': team_2["Deaths"],
+                'Plates': team_2["Plates"],
                 'Towers': team_2["Towers"],
                 'Dragons': team_2["Dragons"],
                 'Heralds': team_2["Heralds"],
+                'Sight_wards': team_2["Sight_wards"],
+                'Control_wards': team_2["Control_wards"],
                 'Gold_diff': team_2["Gold_diff"],
                 'Win': team_2["Win"]
             }

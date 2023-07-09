@@ -40,7 +40,6 @@ X_train, X_test, y_train, y_test = train_test_split(X_original, y_original, test
 
 #Logistic regression using the original df
 log_select = fit_eval(LogisticRegression(max_iter=1000), X_train, y_train, X_test, y_test)
-df = pd.read_csv('Friskis1_team_data.csv')
 
 #We will first set the complete DataFrames
 x_keep_original = ['Gold', 'Level', 'Minions', 'Kills', 'Assists', 'Deaths', 'Towers', 'Dragons', 'Heralds', 'Gold_diff']
@@ -283,7 +282,7 @@ if response.status_code == 200:
     team_order_turrets = 0
     team_chaos_turrets = 0
 
-    # Iterate over the events
+    # Iterate over the eventsF
     for event in data["Events"]:
         event_name = event.get("EventName", "")
 
@@ -296,6 +295,7 @@ if response.status_code == 200:
                 team_order_turrets += 1
                 
     # Print the results
+    print()
     print("Team Order:")
     print("Turret kills:", team_order_turrets)
     print()
