@@ -267,7 +267,6 @@ else:
     # If the request was not successful, print the error message
     print("Error:", response.status_code, response.reason)
 
-
 order_turrets = ['Turret_T1_L_03_A', 'Turret_T1_L_02_A', 'Turret_T1_C_06_A', 'Turret_T1_C_01_A',  'Turret_T1_C_05_A',  'Turret_T1_C_04_A', 'Turret_T1_C_03_A', 'Turret_T1_R_03_A', 'Turret_T1_R_03_A', 'Turret_T1_R_02_A', 'Turret_T1_C_07_A', 'Turret_T1_C_02_A']
 
 # Make the HTTP GET request
@@ -370,13 +369,16 @@ ax.set_ylabel("Probability")
 ax.set_title("Win/Lose Probabilities")
 ax.set_xticks(x)
 ax.set_xticklabels(labels)
-ax.legend()
 
 # Add annotations to the plot
 for i in range(len(labels)):
     ax.annotate("{:.2%}".format(win_probabilities[i]), xy=(x[i], win_probabilities[i]/2), ha='center', va='center')
     ax.annotate("{:.2%}".format(lose_probabilities[i]), xy=(x[i], win_probabilities[i]+lose_probabilities[i]/2), ha='center', va='center')
 
-# Display the plot
+# Set the position of the plot
+fig.canvas.manager.window.wm_geometry("-0+0")
+fig.set_size_inches(plt.rcParams["figure.figsize"][0]/4, plt.rcParams["figure.figsize"][1]/3)
+
 plt.show()
+
 time.sleep(600)
