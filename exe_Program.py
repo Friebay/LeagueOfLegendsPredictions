@@ -1,3 +1,5 @@
+print("Loading...")
+
 import time
 import json
 import requests
@@ -62,6 +64,21 @@ def fit_eval(model, X_train, y_train, X_test, y_test, digits=4, figsize=(2,1), p
     evaluate_model(model, X_train, y_train, X_test, y_test, digits=digits, figsize=figsize, params=params)
 
     return model
+
+def collect_items_by_team(json_data):
+    team1_items = []
+    team2_items = []
+
+    for player in json_data:
+        team = player["team"]
+        items = player["items"]
+
+        if team == "ORDER":
+            team1_items.extend(item["itemID"] for item in items)
+        elif team == "CHAOS":
+            team2_items.extend(item["itemID"] for item in items)
+
+    return team1_items, team2_items
 
 X_train, X_test, y_train, y_test = train_test_split(X_original, y_original, test_size=0.333333, random_state=42)
 
@@ -140,22 +157,6 @@ print("Sum of scores for players in 'ORDER' team:")
 print(order_scores)
 print("Sum of scores for players in 'CHAOS' team:")
 print(chaos_scores)
-
-
-def collect_items_by_team(json_data):
-    team1_items = []
-    team2_items = []
-
-    for player in json_data:
-        team = player["team"]
-        items = player["items"]
-
-        if team == "ORDER":
-            team1_items.extend(item["itemID"] for item in items)
-        elif team == "CHAOS":
-            team2_items.extend(item["itemID"] for item in items)
-
-    return team1_items, team2_items
 
 # Fetch playerlist data
 playerlist_url = "https://127.0.0.1:2999/liveclientdata/playerlist"
