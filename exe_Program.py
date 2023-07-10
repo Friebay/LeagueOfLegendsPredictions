@@ -378,3 +378,4 @@ for i in range(len(labels)):
 
 # Display the plot
 plt.show()
+time.sleep(600)
