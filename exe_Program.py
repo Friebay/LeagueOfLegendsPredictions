@@ -362,10 +362,10 @@ while True:
     team2_lose_probability = 1 - team2_win_probability
 
     print('################')
-    print('Red Win% = ' + str(round(team1_win_probability*100)) + '% Red Lose% = ' + str(round(team1_lose_probability*100)) + '%')
-    print('Blue Win% = ' + str(round(team2_win_probability*100)) + '% Blue Lose% = ' + str(round(team2_lose_probability*100)) + '%')
+    print('Blue Win% = ' + str(round(team1_win_probability*100)) + '% Blue Lose% = ' + str(round(team1_lose_probability*100)) + '%')
+    print('Red Win% = ' + str(round(team2_win_probability*100)) + '% Red Lose% = ' + str(round(team2_lose_probability*100)) + '%')
     
-    time.sleep(30)
+    time.sleep(5)
 
 
 # Define labels and data
