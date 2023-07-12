@@ -60,8 +60,8 @@ for _ in range(10):
 
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 840 and match_data["info"]["gameDuration"] <=7200:
 
-            team_1 = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Sight_wards": 0, "Control_wards": 0}
-            team_2 = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Sight_wards": 0, "Control_wards": 0}
+            team_1_14min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Sight_wards": 0, "Control_wards": 0}
+            team_2_14min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Sight_wards": 0, "Control_wards": 0}
 
             # Determine the minute that we are looking for
             max_frame_index = 14
