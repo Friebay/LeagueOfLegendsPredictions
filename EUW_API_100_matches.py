@@ -1,10 +1,10 @@
 import os
 import time
 import requests
+import random
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-import random
 
 api_key = input("Enter your API key: ")
 username = input("Enter your username: ")
@@ -30,11 +30,10 @@ if os.path.exists(file_path):
 StartNumber = 0
 n=0
 
-# Perform the loop 2 times for 100 matches
-for _ in range(2):
+# Perform the loop 10 times for 500 matches
+for _ in range(10):
     
-
-    for _ in tqdm(range(100), desc="Gathering 100 matches", unit="seconds"):
+    for _ in tqdm(range(100), desc="Gathering 50 matches", unit="seconds"):
         time.sleep(1.2 + random.uniform(0.005, 0.3))
 
     # Initialize combined_data for each iteration
@@ -64,7 +63,13 @@ for _ in range(2):
             team_1 = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Sight_wards": 0, "Control_wards": 0}
             team_2 = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Sight_wards": 0, "Control_wards": 0}
 
-            frame_index = min(14, len(match_timeline["info"]["frames"]) - 1)
+            # Determine the minute that we are looking for
+            max_frame_index = 14
+            # Get the length of the frames in the match timeline
+            timeline_frames_length = len(match_timeline["info"]["frames"])
+            # Calculate the frame index, ensuring it does not exceed the maximum frame index
+            frame_index = min(max_frame_index, timeline_frames_length - 1)
+
 
             for j in range(1, 6):
                 participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
