@@ -6,8 +6,12 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-api_key = input("Enter your API key: ")
-username = input("Enter your username: ")
+with open("API.txt", "r") as file:
+    api_key = file.read().strip()
+
+with open("name.txt", "r") as file:
+    username = file.read().strip()
+    
 username = username.replace(" ", "%20")
 print()
 
