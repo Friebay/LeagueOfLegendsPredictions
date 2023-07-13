@@ -74,24 +74,24 @@ for _ in range(10):
             for j in range(1, 6):
                 participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
                 if participant_frame is not None:
-                    team_1["Gold"] += participant_frame["totalGold"]
-                    team_1["Level"] += participant_frame["level"]
-                    team_1["Minions"] += participant_frame["minionsKilled"]
-                    team_1["Minions"] += participant_frame["jungleMinionsKilled"]
+                    team_1_14min["Gold"] += participant_frame["totalGold"]
+                    team_1_14min["Level"] += participant_frame["level"]
+                    team_1_14min["Minions"] += participant_frame["minionsKilled"]
+                    team_1_14min["Minions"] += participant_frame["jungleMinionsKilled"]
 
             for j in range(6, 11):
                 participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
                 if participant_frame is not None:
-                    team_2["Gold"] += participant_frame["totalGold"]
-                    team_2["Level"] += participant_frame["level"]
-                    team_2["Minions"] += participant_frame["minionsKilled"]
-                    team_2["Minions"] += participant_frame["jungleMinionsKilled"]
+                    team_2_14min["Gold"] += participant_frame["totalGold"]
+                    team_2_14min["Level"] += participant_frame["level"]
+                    team_2_14min["Minions"] += participant_frame["minionsKilled"]
+                    team_2_14min["Minions"] += participant_frame["jungleMinionsKilled"]
 
-            team_1["Level"] /= 5
-            team_2["Level"] /= 5
+            team_1_14min["Level"] /= 5
+            team_2_14min["Level"] /= 5
 
-            team_1["Gold_diff"] = team_1["Gold"] - team_2["Gold"]
-            team_2["Gold_diff"] = team_2["Gold"] - team_1["Gold"]
+            team_1_14min["Gold_diff"] = team_1_14min["Gold"] - team_2_14min["Gold"]
+            team_2_14min["Gold_diff"] = team_2_14min["Gold"] - team_1_14min["Gold"]
             
             #The rest of the info is not available in the minute 14 data, so it has to be scarped minute by minute that why we iterate from 1 to 14
             for i in range(1, 15):
@@ -101,98 +101,98 @@ for _ in range(10):
 
                                 #If the Killer ID is between 1 and 5 is corresponds to team1, if its bigger than 5 is for team2. This pattern is repeated through out the iteration of events
                                 if (j["type"] == "CHAMPION_KILL") and (1 <= j["killerId"] <= 5):
-                                    team_1["Kills"] += 1
-                                    team_2["Deaths"] += 1
+                                    team_1_14min["Kills"] += 1
+                                    team_2_14min["Deaths"] += 1
                                     try:
-                                        team_1["Assists"] += len(j["assistingParticipantIds"])
+                                        team_1_14min["Assists"] += len(j["assistingParticipantIds"])
                                     except:
                                         pass
                                 if (j["type"] == "CHAMPION_KILL") and (j["killerId"] > 5):
-                                    team_2["Kills"] += 1
-                                    team_1["Deaths"] += 1
+                                    team_2_14min["Kills"] += 1
+                                    team_1_14min["Deaths"] += 1
                                     try:
-                                        team_2["Assists"] += len(j["assistingParticipantIds"])
+                                        team_2_14min["Assists"] += len(j["assistingParticipantIds"])
                                     except:
                                         pass
                                 
                                 #Get Turret plates destroyed
                                 if (j["type"] == "TURRET_PLATE_DESTROYED") and (1 <= j["killerId"] <= 5):
-                                    team_1["Plates"] += 1
+                                    team_1_14min["Plates"] += 1
                                 if (j["type"] == "TURRET_PLATE_DESTROYED") and (j["killerId"] > 5):
-                                    team_2["Plates"] += 1
+                                    team_2_14min["Plates"] += 1
                                     
                                 if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 200):
-                                    team_1["Towers"] += 1
+                                    team_1_14min["Towers"] += 1
                                 if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 100):
-                                    team_2["Towers"] += 1 
+                                    team_2_14min["Towers"] += 1 
                                 
                                 #Get Dragons and Heralds
                                 if (j["type"] == "ELITE_MONSTER_KILL") and (1 <= j["killerId"] <= 5):
                                     if j["monsterType"] == "DRAGON":
-                                        team_1["Dragons"] += 1
+                                        team_1_14min["Dragons"] += 1
                                     elif j["monsterType"] == "RIFTHERALD":
-                                        team_1["Heralds"] += 1
+                                        team_1_14min["Heralds"] += 1
                                     
                                 if (j["type"] == "ELITE_MONSTER_KILL") and (j["killerId"] > 5):
                                     if j["monsterType"] == "DRAGON":
-                                        team_2["Dragons"] += 1
+                                        team_2_14min["Dragons"] += 1
                                     elif j["monsterType"] == "RIFTHERALD":
-                                        team_2["Heralds"] += 1                
+                                        team_2_14min["Heralds"] += 1                
                                 
                                 #Get wards placed
                                 if (j["type"] == "WARD_PLACED" and j["wardType"] == "CONTROL_WARD") and (1 <= j["creatorId"] <= 5):
-                                    team_1["Control_wards"] += 1
+                                    team_1_14min["Control_wards"] += 1
                                 if (j["type"] == "WARD_PLACED" and j["wardType"] == "CONTROL_WARD") and (j["creatorId"] > 5):
-                                    team_2["Control_wards"] += 1
+                                    team_2_14min["Control_wards"] += 1
                                     
                                 if (j["type"] == "WARD_PLACED" and (j["wardType"] == "SIGHT_WARD" or j["wardType"] == "YELLOW_TRINKET")) and (1 <= j["creatorId"] <= 5):
-                                    team_1["Sight_wards"] += 1
+                                    team_1_14min["Sight_wards"] += 1
                                 if (j["type"] == "WARD_PLACED" and (j["wardType"] == "SIGHT_WARD" or j["wardType"] == "YELLOW_TRINKET")) and (j["creatorId"] > 5):
-                                    team_2["Sight_wards"] += 1
+                                    team_2_14min["Sight_wards"] += 1
 
             if match_data["info"]["teams"][0]["win"]:
-                team_1["Win"] = 1
-                team_2["Win"] = 0
+                team_1_14min["Win"] = 1
+                team_2_14min["Win"] = 0
             else:
-                team_1["Win"] = 0
-                team_2["Win"] = 1
+                team_1_14min["Win"] = 0
+                team_2_14min["Win"] = 1
 
-            team_1_data = {
-                'Gold': team_1["Gold"],
-                'Level': team_1["Level"],
-                'Minions': team_1["Minions"],
-                'Kills': team_1["Kills"],
-                'Assists': team_1["Assists"],
-                'Deaths': team_1["Deaths"],
-                'Plates': team_1["Plates"],
-                'Towers': team_1["Towers"],
-                'Dragons': team_1["Dragons"],
-                'Heralds': team_1["Heralds"],
-                'Sight_wards': team_1["Sight_wards"],
-                'Control_wards': team_1["Control_wards"],
-                'Gold_diff': team_1["Gold_diff"],
-                'Win': team_1["Win"]
+            team_1_14min_data = {
+                'Gold': team_1_14min["Gold"],
+                'Level': team_1_14min["Level"],
+                'Minions': team_1_14min["Minions"],
+                'Kills': team_1_14min["Kills"],
+                'Assists': team_1_14min["Assists"],
+                'Deaths': team_1_14min["Deaths"],
+                'Plates': team_1_14min["Plates"],
+                'Towers': team_1_14min["Towers"],
+                'Dragons': team_1_14min["Dragons"],
+                'Heralds': team_1_14min["Heralds"],
+                'Sight_wards': team_1_14min["Sight_wards"],
+                'Control_wards': team_1_14min["Control_wards"],
+                'Gold_diff': team_1_14min["Gold_diff"],
+                'Win': team_1_14min["Win"]
             }
 
-            team_2_data = {
-                'Gold': team_2["Gold"],
-                'Level': team_2["Level"],
-                'Minions': team_2["Minions"],
-                'Kills': team_2["Kills"],
-                'Assists': team_2["Assists"],
-                'Deaths': team_2["Deaths"],
-                'Plates': team_2["Plates"],
-                'Towers': team_2["Towers"],
-                'Dragons': team_2["Dragons"],
-                'Heralds': team_2["Heralds"],
-                'Sight_wards': team_2["Sight_wards"],
-                'Control_wards': team_2["Control_wards"],
-                'Gold_diff': team_2["Gold_diff"],
-                'Win': team_2["Win"]
+            team_2_14min_data = {
+                'Gold': team_2_14min["Gold"],
+                'Level': team_2_14min["Level"],
+                'Minions': team_2_14min["Minions"],
+                'Kills': team_2_14min["Kills"],
+                'Assists': team_2_14min["Assists"],
+                'Deaths': team_2_14min["Deaths"],
+                'Plates': team_2_14min["Plates"],
+                'Towers': team_2_14min["Towers"],
+                'Dragons': team_2_14min["Dragons"],
+                'Heralds': team_2_14min["Heralds"],
+                'Sight_wards': team_2_14min["Sight_wards"],
+                'Control_wards': team_2_14min["Control_wards"],
+                'Gold_diff': team_2_14min["Gold_diff"],
+                'Win': team_2_14min["Win"]
             }
 
-            combined_data.append(team_1_data)
-            combined_data.append(team_2_data)
+            combined_data.append(team_1_14min_data)
+            combined_data.append(team_2_14min_data)
 
     # Update StartNumber and EndNumber for the next iteration
     StartNumber += 50
