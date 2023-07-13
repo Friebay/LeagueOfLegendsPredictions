@@ -24,11 +24,14 @@ player_info = responseAccount.json()
 
 puuid = player_info['puuid']
 
-file_name = "team_data.csv"
-file_path = username + "_" + file_name
+file_path_4min = username + "_team_data_4min.csv"
+file_path_14min = username + "_team_data_14min.csv"
 
-if os.path.exists(file_path):
-    os.remove(file_path)
+if os.path.exists(file_path_4min):
+    os.remove(file_path_4min)
+
+if os.path.exists(file_path_14min):
+    os.remove(file_path_14min)
 
 # Initialize StartNumber
 StartNumber = 0
@@ -40,8 +43,8 @@ for _ in range(10):
     for _ in tqdm(range(100), desc="Gathering 50 matches", unit="seconds"):
         time.sleep(1.2 + random.uniform(0.005, 0.3))
 
-    # Initialize combined_data for each iteration
-    combined_data = []
+    # Initialize combined_data_14min for each iteration
+    combined_data_14min = []
 
     api_MatchHistory = "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids?start=" + str(StartNumber) + "&count=" + "50"
 
@@ -195,8 +198,8 @@ for _ in range(10):
                 'Win': team_2_14min["Win"]
             }
 
-            combined_data.append(team_1_14min_data)
-            combined_data.append(team_2_14min_data)
+            combined_data_14min.append(team_1_14min_data)
+            combined_data_14min.append(team_2_14min_data)
 
     # Update StartNumber and EndNumber for the next iteration
     StartNumber += 50
@@ -205,7 +208,7 @@ for _ in range(10):
     print()
 
     # Save the combined data to a CSV file
-    combined_df = pd.DataFrame(combined_data)
-    combined_df.to_csv(file_path, index=False, mode='a', header=not os.path.exists(file_path))
+    combined_df = pd.DataFrame(combined_data_14min)
+    combined_df.to_csv(file_path_14min, index=False, mode='a', header=not os.path.exists(file_path_14min))
     
 time.sleep(600)
