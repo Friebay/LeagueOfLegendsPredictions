@@ -11,60 +11,10 @@ from sklearn.linear_model import LogisticRegression
 import win32gui
 import win32con
 
-# Create a window that is always on top of other windows
-hwnd = win32gui.GetForegroundWindow()
-win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 1650, 0, 300, 120, win32con.SWP_SHOWWINDOW)
-
-with open("name.txt", "r") as file:
-    username = file.read().strip()
-    
-username = username.replace(" ", "%20")
-
-df = pd.read_csv(username + '_team_data.csv')
-
-#We will first set the complete DataFrames
-x_keep_original = ['Gold', 'Level', 'Minions', 'Kills', 'Assists', 'Deaths', 'Towers', 'Dragons', 'Heralds', 'Gold_diff']
-X_original = df[x_keep_original]
-y_original = df["Win"]
-
 def evaluate_model(model, X_train, y_train, X_test, y_test, digits=4, figsize=(10,5), params=False):
     # Get Predictions
     y_hat_test = model.predict(X_test)
     y_hat_train = model.predict(X_train)
-
-    if params == True:
-        print("****MODEL PARAMETERS****")
-        params = pd.DataFrame(pd.Series(model.get_params()))
-        params.columns=['parameters']
-        display(params)
-
-def fit_eval(model, X_train, y_train, X_test, y_test, digits=4, figsize=(2,1), params=False):
-    model.fit(X_train, y_train)
-
-    evaluate_model(model, X_train, y_train, X_test, y_test, digits=digits, figsize=figsize, params=params)
-
-    return model
-
-X_train, X_test, y_train, y_test = train_test_split(X_original, y_original, test_size=0.333333, random_state=42)
-
-#Logistic regression using the original df
-log_select = fit_eval(LogisticRegression(max_iter=1000), X_train, y_train, X_test, y_test)
-
-#We will first set the complete DataFrames
-x_keep_original = ['Gold', 'Level', 'Minions', 'Kills', 'Assists', 'Deaths', 'Towers', 'Dragons', 'Heralds', 'Gold_diff']
-X_original = df[x_keep_original]
-y_original = df["Win"]
-
-def evaluate_model(model, X_train, y_train, X_test, y_test, digits=4, figsize=(10,5), params=False):
-    # Get Predictions
-    y_hat_test = model.predict(X_test)
-    y_hat_train = model.predict(X_train)
-
-    if params == True:
-        print("****MODEL PARAMETERS****")
-        params = pd.DataFrame(pd.Series(model.get_params()))
-        params.columns=['parameters']
-        display(params)
 
 def fit_eval(model, X_train, y_train, X_test, y_test, digits=4, figsize=(2,1), params=False):
     model.fit(X_train, y_train)
@@ -88,6 +38,22 @@ def collect_items_by_team(json_data):
 
     return team1_items, team2_items
 
+# Create a window that is always on top of other windows
+hwnd = win32gui.GetForegroundWindow()
+win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 1650, 0, 300, 120, win32con.SWP_SHOWWINDOW)
+
+with open("name.txt", "r") as file:
+    username = file.read().strip()
+    
+username = username.replace(" ", "%20")
+
+df = pd.read_csv(username + '_team_data_4min.csv')
+
+#We will first set the complete DataFrames
+x_keep_original = ['Gold', 'Level', 'Minions', 'Kills', 'Assists', 'Deaths', 'Towers', 'Dragons', 'Heralds', 'Gold_diff', 'Barons']
+X_original = df[x_keep_original]
+y_original = df["Win"]
+
 X_train, X_test, y_train, y_test = train_test_split(X_original, y_original, test_size=0.333333, random_state=42)
 
 #Logistic regression using the original df
@@ -96,9 +62,15 @@ log_select = fit_eval(LogisticRegression(max_iter=1000), X_train, y_train, X_tes
 # Disable SSL certificate verification
 requests.packages.urllib3.disable_warnings()
 
+order_turrets = ['Turret_T1_L_03_A', 'Turret_T1_L_02_A', 'Turret_T1_C_06_A', 'Turret_T1_C_01_A',  'Turret_T1_C_05_A',  'Turret_T1_C_04_A', 'Turret_T1_C_03_A', 'Turret_T1_R_03_A', 'Turret_T1_R_03_A', 'Turret_T1_R_02_A', 'Turret_T1_C_07_A', 'Turret_T1_C_02_A']
+gamestats_url = "https://127.0.0.1:2999/liveclientdata/gamestats"
+playerlist_URL = "https://127.0.0.1:2999/liveclientdata/playerlist"
+items_url = "https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/items.json"
+Event_url = "https://127.0.0.1:2999/liveclientdata/eventdata"
+
 while True:
     # Fetch the JSON data from the URL without SSL verification
-    gamestats_url = "https://127.0.0.1:2999/liveclientdata/gamestats"
+    
     response = requests.get(gamestats_url, verify=False)
     data = response.json()
 
@@ -116,7 +88,7 @@ while True:
     print("Game Time: {} minutes {} seconds".format(formatted_minutes, formatted_seconds))
 
     # Fetch playerlist data
-    playerlist_URL = "https://127.0.0.1:2999/liveclientdata/playerlist"
+    
     response = requests.get(playerlist_URL, verify=False)
     data = response.json()
 
@@ -168,8 +140,8 @@ while True:
     print(chaos_scores)
 
     # Fetch playerlist data
-    playerlist_url = "https://127.0.0.1:2999/liveclientdata/playerlist"
-    response = requests.get(playerlist_url, verify=False)
+    
+    response = requests.get(playerlist_URL, verify=False)
 
     # Check if the request was successful
     if response.status_code == 200:
@@ -184,7 +156,6 @@ while True:
 
 
     # Static URL for the items.json data
-    items_url = "https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/items.json"
     def fetch_items_data():
         try:
             response = requests.get(items_url)
@@ -227,9 +198,6 @@ while True:
     print(f"Total item price for team 1: {team1_total_price} gold.")
     print(f"Total item price for team 2: {team2_total_price} gold.")
 
-    Event_url = "https://127.0.0.1:2999/liveclientdata/eventdata"
-
-    # Make the HTTP GET request
     response = requests.get(Event_url, verify=False)  # Set verify to False if using self-signed certificate
 
     # Check if the request was successful (status code 200)
@@ -276,10 +244,7 @@ while True:
         # If the request was not successful, print the error message
         print("Error:", response.status_code, response.reason)
 
-    order_turrets = ['Turret_T1_L_03_A', 'Turret_T1_L_02_A', 'Turret_T1_C_06_A', 'Turret_T1_C_01_A',  'Turret_T1_C_05_A',  'Turret_T1_C_04_A', 'Turret_T1_C_03_A', 'Turret_T1_R_03_A', 'Turret_T1_R_03_A', 'Turret_T1_R_02_A', 'Turret_T1_C_07_A', 'Turret_T1_C_02_A']
-
-    # Make the HTTP GET request
-    response = requests.get(Event_url, verify=False)  # Set verify to False if using self-signed certificate
+    response = requests.get(Event_url, verify=False)
 
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
@@ -365,8 +330,10 @@ while True:
     print('Blue Win% = ' + str(round(team1_win_probability*100)) + '% Blue Lose% = ' + str(round(team1_lose_probability*100)) + '%')
     print('Red Win% = ' + str(round(team2_win_probability*100)) + '% Red Lose% = ' + str(round(team2_lose_probability*100)) + '%')
     
+    # runs code every 5 seconds
     time.sleep(5)
 
+# code under is for bar chart which currently doesn't show up as I want to
 
 # Define labels and data
 labels = ["Team 1", "Team 2"]
