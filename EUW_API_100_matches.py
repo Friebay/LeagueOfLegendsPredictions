@@ -80,8 +80,8 @@ for _ in range(6):
         # if match is longer than 4 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 240 and match_data["info"]["gameDuration"] <=5400:
 
-            team_1_4min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0, "Sight_wards": 0, "Control_wards": 0}
-            team_2_4min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Plates": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0, "Sight_wards": 0, "Control_wards": 0}
+            team_1_4min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+            team_2_4min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
 
             # Determine the minute that we are looking for
             max_frame_index = 4
@@ -134,12 +134,6 @@ for _ in range(6):
                                         team_2_4min["Assists"] += len(j["assistingParticipantIds"])
                                     except:
                                         pass
-                                
-                                #Get Turret plates destroyed
-                                if (j["type"] == "TURRET_PLATE_DESTROYED") and (1 <= j["killerId"] <= 5):
-                                    team_1_4min["Plates"] += 1
-                                if (j["type"] == "TURRET_PLATE_DESTROYED") and (j["killerId"] > 5):
-                                    team_2_4min["Plates"] += 1
                                     
                                 if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 200):
                                     team_1_4min["Towers"] += 1
@@ -162,18 +156,7 @@ for _ in range(6):
                                     elif j["monsterType"] == "RIFTHERALD":
                                         team_2_4min["Heralds"] += 1    
                                     elif j["monsterType"] == "BARON_NASHOR":
-                                        team_1_4min["Barons"] += 1            
-                                
-                                #Get wards placed
-                                if (j["type"] == "WARD_PLACED" and j["wardType"] == "CONTROL_WARD") and (1 <= j["creatorId"] <= 5):
-                                    team_1_4min["Control_wards"] += 1
-                                if (j["type"] == "WARD_PLACED" and j["wardType"] == "CONTROL_WARD") and (j["creatorId"] > 5):
-                                    team_2_4min["Control_wards"] += 1
-                                    
-                                if (j["type"] == "WARD_PLACED" and (j["wardType"] == "SIGHT_WARD" or j["wardType"] == "YELLOW_TRINKET")) and (1 <= j["creatorId"] <= 5):
-                                    team_1_4min["Sight_wards"] += 1
-                                if (j["type"] == "WARD_PLACED" and (j["wardType"] == "SIGHT_WARD" or j["wardType"] == "YELLOW_TRINKET")) and (j["creatorId"] > 5):
-                                    team_2_4min["Sight_wards"] += 1
+                                        team_1_4min["Barons"] += 1
 
             if match_data["info"]["teams"][0]["win"]:
                 team_1_4min["Win"] = 1
@@ -189,13 +172,10 @@ for _ in range(6):
                 'Kills': team_1_4min["Kills"],
                 'Assists': team_1_4min["Assists"],
                 'Deaths': team_1_4min["Deaths"],
-                'Plates': team_1_4min["Plates"],
                 'Towers': team_1_4min["Towers"],
                 'Dragons': team_1_4min["Dragons"],
                 'Heralds': team_1_4min["Heralds"],
                 'Barons': team_1_4min["Barons"],
-                'Sight_wards': team_1_4min["Sight_wards"],
-                'Control_wards': team_1_4min["Control_wards"],
                 'Gold_diff': team_1_4min["Gold_diff"],
                 'Win': team_1_4min["Win"]
             }
@@ -207,20 +187,16 @@ for _ in range(6):
                 'Kills': team_2_4min["Kills"],
                 'Assists': team_2_4min["Assists"],
                 'Deaths': team_2_4min["Deaths"],
-                'Plates': team_2_4min["Plates"],
                 'Towers': team_2_4min["Towers"],
                 'Dragons': team_2_4min["Dragons"],
                 'Heralds': team_2_4min["Heralds"],
                 'Barons': team_2_4min["Barons"],
-                'Sight_wards': team_2_4min["Sight_wards"],
-                'Control_wards': team_2_4min["Control_wards"],
                 'Gold_diff': team_2_4min["Gold_diff"],
                 'Win': team_2_4min["Win"]
             }
 
             combined_data_4min.append(team_1_4min_data)
             combined_data_4min.append(team_2_4min_data)
-            
             
         # if match is longer than 14 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 840 and match_data["info"]["gameDuration"] <=5400:
