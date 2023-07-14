@@ -18,46 +18,24 @@ def evaluate_model(model, X_train, y_train, X_test, y_test, digits=4, figsize=(1
 
 def fit_eval(model, X_train, y_train, X_test, y_test, digits=4, figsize=(2,1), params=False):
     model.fit(X_train, y_train)
-
     evaluate_model(model, X_train, y_train, X_test, y_test, digits=digits, figsize=figsize, params=params)
-
     return model
 
 def collect_items_by_team(json_data):
     team1_items = []
     team2_items = []
-
     for player in json_data:
         team = player["team"]
         items = player["items"]
-
         if team == "ORDER":
             team1_items.extend(item["itemID"] for item in items)
         elif team == "CHAOS":
             team2_items.extend(item["itemID"] for item in items)
-
     return team1_items, team2_items
 
 # Create a window that is always on top of other windows
 hwnd = win32gui.GetForegroundWindow()
 win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 1650, 0, 300, 120, win32con.SWP_SHOWWINDOW)
-
-with open("name.txt", "r") as file:
-    username = file.read().strip()
-    
-username = username.replace(" ", "%20")
-
-df = pd.read_csv(username + '_team_data_4min.csv')
-
-#We will first set the complete DataFrames
-x_keep_original = ['Gold', 'Level', 'Minions', 'Kills', 'Assists', 'Deaths', 'Towers', 'Dragons', 'Heralds', 'Gold_diff', 'Barons']
-X_original = df[x_keep_original]
-y_original = df["Win"]
-
-X_train, X_test, y_train, y_test = train_test_split(X_original, y_original, test_size=0.333333, random_state=42)
-
-#Logistic regression using the original df
-log_select = fit_eval(LogisticRegression(max_iter=1000), X_train, y_train, X_test, y_test)
 
 # Disable SSL certificate verification
 requests.packages.urllib3.disable_warnings()
@@ -303,20 +281,37 @@ while True:
         "Heralds": team_chaos_herald_kills,
         "Gold_diff": team2_total_price - team1_total_price
     }
+    
+    with open("name.txt", "r") as file:
+        username = file.read().strip()
+    
+    username = username.replace(" ", "%20")
+
+    df = pd.read_csv(username + '_team_data_4min.csv')
+
+    #We will first set the complete DataFrames
+    x_keep_original = ['Gold', 'Level', 'Minions', 'Kills', 'Assists', 'Deaths', 'Towers', 'Dragons', 'Heralds', 'Gold_diff', 'Barons']
+    X_original = df[x_keep_original]
+    y_original = df["Win"]
+
+    X_train, X_test, y_train, y_test = train_test_split(X_original, y_original, test_size=0.333333, random_state=42)
+
+    #Logistic regression using the original df
+    log_select = fit_eval(LogisticRegression(max_iter=1000), X_train, y_train, X_test, y_test)
 
     # Create DataFrame and select features for team 1
     team_1_df = pd.DataFrame(team_1, index=[0])
     team_1_features = team_1_df[x_keep_original]
+        
+    # Create DataFrame and select features for team 2
+    team_2_df = pd.DataFrame(team_2, index=[0])
+    team_2_features = team_2_df[x_keep_original]
 
     # Make prediction for team 1
     team1_prediction = log_select.predict(team_1_features)
     team1_prediction_probabilities = log_select.predict_proba(team_1_features)
     team1_win_probability = team1_prediction_probabilities[0][1]
-
-    # Create DataFrame and select features for team 2
-    team_2_df = pd.DataFrame(team_2, index=[0])
-    team_2_features = team_2_df[x_keep_original]
-
+        
     # Make prediction for team 2
     team2_prediction = log_select.predict(team_2_features)
     team2_prediction_probabilities = log_select.predict_proba(team_2_features)
@@ -329,7 +324,7 @@ while True:
     print('################')
     print('Blue Win% = ' + str(round(team1_win_probability*100)) + '% Blue Lose% = ' + str(round(team1_lose_probability*100)) + '%')
     print('Red Win% = ' + str(round(team2_win_probability*100)) + '% Red Lose% = ' + str(round(team2_lose_probability*100)) + '%')
-    
+        
     # runs code every 5 seconds
     time.sleep(5)
 
