@@ -286,6 +286,8 @@ while True:
         username = file.read().strip()
     
     username = username.replace(" ", "%20")
+    
+    #### while game_time_seconds under 6 minutes use 4 min, if under 18 min use 14 and etc
 
     df = pd.read_csv(username + '_team_data_4min.csv')
 
