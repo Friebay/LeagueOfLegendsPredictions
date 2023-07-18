@@ -24,23 +24,20 @@ player_info = responseAccount.json()
 
 puuid = player_info['puuid']
 
-file_path_4min = username + "_team_data_4min.csv"
-file_path_14min = username + "_team_data_14min.csv"
-file_path_28min = username + "_team_data_28min.csv"
-file_path_42min = username + "_team_data_42min.csv"
+file_paths = [f"{username}_team_data_{i}min.csv" for i in range(1, 45)]
 
 
-if os.path.exists(file_path_4min):
-    os.remove(file_path_4min)
+if os.path.exists(file_paths[3]):
+    os.remove(file_paths[3])
 
-if os.path.exists(file_path_14min):
-    os.remove(file_path_14min)
+if os.path.exists(file_paths[13]):
+    os.remove(file_paths[13])
     
-if os.path.exists(file_path_28min):
-    os.remove(file_path_28min)
+if os.path.exists(file_paths[27]):
+    os.remove(file_paths[27])
     
-if os.path.exists(file_path_42min):
-    os.remove(file_path_42min)
+if os.path.exists(file_paths[41]):
+    os.remove(file_paths[41])
 
 # Initialize StartNumber
 StartNumber = 0
@@ -52,10 +49,7 @@ for _ in range(6):
     for _ in tqdm(range(100), desc="Gathering 50 matches", unit="seconds"):
         time.sleep(1.2 + random.uniform(0.005, 0.3))
 
-    combined_data_4min = []
-    combined_data_14min = []
-    combined_data_28min = []
-    combined_data_42min = []
+    combined_data = [[] for i in range(45)]
 
     api_MatchHistory = "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids?start=" + str(StartNumber) + "&count=" + "50"
 
@@ -195,8 +189,8 @@ for _ in range(6):
                 'Win': team_2_4min["Win"]
             }
 
-            combined_data_4min.append(team_1_4min_data)
-            combined_data_4min.append(team_2_4min_data)
+            combined_data[3].append(team_1_4min_data)
+            combined_data[3].append(team_2_4min_data)
             
         # if match is longer than 14 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 840 and match_data["info"]["gameDuration"] <=5400:
@@ -316,8 +310,8 @@ for _ in range(6):
                 'Win': team_2_14min["Win"]
             }
 
-            combined_data_14min.append(team_1_14min_data)
-            combined_data_14min.append(team_2_14min_data)
+            combined_data[13].append(team_1_14min_data)
+            combined_data[13].append(team_2_14min_data)
             
         # if match is longer than 28 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 1680 and match_data["info"]["gameDuration"] <=5400:
@@ -438,8 +432,8 @@ for _ in range(6):
                 'Win': team_2_28min["Win"]
             }
 
-            combined_data_28min.append(team_1_28min_data)
-            combined_data_28min.append(team_2_28min_data)
+            combined_data[27].append(team_1_28min_data)
+            combined_data[27].append(team_2_28min_data)
             
         # if match is longer than 42 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 2520 and match_data["info"]["gameDuration"] <=5400:
@@ -558,8 +552,8 @@ for _ in range(6):
                 'Win': team_2_42min["Win"]
             }
 
-            combined_data_42min.append(team_1_42min_data)
-            combined_data_42min.append(team_2_42min_data)
+            combined_data[41].append(team_1_42min_data)
+            combined_data[41].append(team_2_42min_data)
 
 
     # Update StartNumber and EndNumber for the next iteration
@@ -569,17 +563,29 @@ for _ in range(6):
     print()
 
     # Save the combined data to a CSV file
-    combined_df_4min = pd.DataFrame(combined_data_4min)
-    combined_df_4min.to_csv(file_path_4min, index=False, mode='a', header=not os.path.exists(file_path_4min))
+    combined_df_1min = pd.DataFrame(combined_data[0])
+    combined_df_1min.to_csv(file_paths[0], index=False, mode='a', header=not os.path.exists(file_paths[0]))
     
-    combined_df_14min = pd.DataFrame(combined_data_14min)
-    combined_df_14min.to_csv(file_path_14min, index=False, mode='a', header=not os.path.exists(file_path_14min))
+    combined_df_2min = pd.DataFrame(combined_data[1])
+    combined_df_2min.to_csv(file_paths[1], index=False, mode='a', header=not os.path.exists(file_paths[1]))
     
-    combined_df_28min = pd.DataFrame(combined_data_28min)
-    combined_df_28min.to_csv(file_path_28min, index=False, mode='a', header=not os.path.exists(file_path_28min))
+    combined_df_3min = pd.DataFrame(combined_data[2])
+    combined_df_3min.to_csv(file_paths[2], index=False, mode='a', header=not os.path.exists(file_paths[2]))
     
-    combined_df_42min = pd.DataFrame(combined_data_42min)
-    combined_df_42min.to_csv(file_path_42min, index=False, mode='a', header=not os.path.exists(file_path_42min))
+    combined_df_4min = pd.DataFrame(combined_data[3])
+    combined_df_4min.to_csv(file_paths[3], index=False, mode='a', header=not os.path.exists(file_paths[3]))
+    
+    combined_df_5min = pd.DataFrame(combined_data[4])
+    combined_df_5min.to_csv(file_paths[4], index=False, mode='a', header=not os.path.exists(file_paths[4]))
+    
+    combined_df_14min = pd.DataFrame(combined_data[13])
+    combined_df_14min.to_csv(file_paths[13], index=False, mode='a', header=not os.path.exists(file_paths[13]))
+    
+    combined_df_28min = pd.DataFrame(combined_data[27])
+    combined_df_28min.to_csv(file_paths[27], index=False, mode='a', header=not os.path.exists(file_paths[27]))
+    
+    combined_df_42min = pd.DataFrame(combined_data[41])
+    combined_df_42min.to_csv(file_paths[41], index=False, mode='a', header=not os.path.exists(file_paths[41]))
     
     
 time.sleep(600)
