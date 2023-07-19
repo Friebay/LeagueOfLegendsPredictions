@@ -914,7 +914,7 @@ for _ in range(6):
     print()
 
     # Save the combined data to a CSV file
-    combined_data = [pd.DataFrame(combined_data[i]) for i in range(0, 45)]
+    combined_data = [pd.DataFrame(combined_data[i]) for i in range(0, 46)]
 
     for df, file_path in zip(combined_data, file_paths):
         df.to_csv(file_path, index=False, mode='a', header=not os.path.exists(file_path))    
