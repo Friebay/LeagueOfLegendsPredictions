@@ -26,32 +26,10 @@ puuid = player_info['puuid']
 
 file_paths = [f"{username}_team_data_{i}min.csv" for i in range(1, 45)]
 
-if os.path.exists(file_paths[0]):
-    os.remove(file_paths[0])
-    
-if os.path.exists(file_paths[1]):
-    os.remove(file_paths[1])
-    
-if os.path.exists(file_paths[2]):
-    os.remove(file_paths[2])
-
-if os.path.exists(file_paths[3]):
-    os.remove(file_paths[3])
-    
-if os.path.exists(file_paths[4]):
-    os.remove(file_paths[4])
-
-if os.path.exists(file_paths[5]):
-    os.remove(file_paths[5])
-
-if os.path.exists(file_paths[13]):
-    os.remove(file_paths[13])
-    
-if os.path.exists(file_paths[27]):
-    os.remove(file_paths[27])
-    
-if os.path.exists(file_paths[41]):
-    os.remove(file_paths[41])
+for i in range(0, 44):
+    file_path = "file_path_{}".format(i)
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
 # Initialize StartNumber
 StartNumber = 0
@@ -120,7 +98,7 @@ for _ in range(6):
             team_2_1min["Gold_diff"] = team_2_1min["Gold"] - team_1_1min["Gold"]
             
             #The rest of the info is not available in the minute 1 data, so it has to be scarped minute by minute that why we iterate from 1 to 15 (15 minute is not taken into account, 15 is because how Python works)
-            for i in range(1, 2):
+            for i in range(1, max_frame_index+1):
 
                     #For each minute a list of events its presented, so we can iterate through each event and get necessary info
                             for j in match_timeline["info"]["frames"][i]["events"]:
@@ -201,8 +179,8 @@ for _ in range(6):
                 'Win': team_2_1min["Win"]
             }
 
-            combined_data[0].append(team_1_1min_data)
-            combined_data[0].append(team_2_1min_data)
+            combined_data[max_frame_index-1].append(team_1_1min_data)
+            combined_data[max_frame_index-1].append(team_2_1min_data)
         
         # if match is longer than 2 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 120 and match_data["info"]["gameDuration"] <=5400:
@@ -240,7 +218,7 @@ for _ in range(6):
             team_2_2min["Gold_diff"] = team_2_2min["Gold"] - team_1_2min["Gold"]
             
             #The rest of the info is not available in the minute 1 data, so it has to be scarped minute by minute that why we iterate from 1 to 15 (15 minute is not taken into account, 15 is because how Python works)
-            for i in range(1, 3):
+            for i in range(1, max_frame_index+1):
 
                     #For each minute a list of events its presented, so we can iterate through each event and get necessary info
                             for j in match_timeline["info"]["frames"][i]["events"]:
@@ -321,8 +299,128 @@ for _ in range(6):
                 'Win': team_2_2min["Win"]
             }
 
-            combined_data[1].append(team_1_2min_data)
-            combined_data[1].append(team_2_2min_data)
+            combined_data[max_frame_index-1].append(team_1_2min_data)
+            combined_data[max_frame_index-1].append(team_2_2min_data)
+        
+        # if match is longer than 3 minutes, then run the code
+        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 180 and match_data["info"]["gameDuration"] <=5400:
+
+            team_1_3min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+            team_2_3min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+
+            # Determine the minute that we are looking for
+            max_frame_index = 3
+            # Get the length of the frames in the match timeline
+            timeline_frames_length = len(match_timeline["info"]["frames"])
+            # Calculate the frame index, ensuring it does not exceed the maximum frame index
+            frame_index = min(max_frame_index, timeline_frames_length - 1)
+
+            for j in range(1, 6):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_1_3min["Gold"] += participant_frame["totalGold"]
+                    team_1_3min["Level"] += participant_frame["level"]
+                    team_1_3min["Minions"] += participant_frame["minionsKilled"]
+                    team_1_3min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            for j in range(6, 11):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_2_3min["Gold"] += participant_frame["totalGold"]
+                    team_2_3min["Level"] += participant_frame["level"]
+                    team_2_3min["Minions"] += participant_frame["minionsKilled"]
+                    team_2_3min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            team_1_3min["Level"] /= 5
+            team_2_3min["Level"] /= 5
+
+            team_1_3min["Gold_diff"] = team_1_3min["Gold"] - team_2_3min["Gold"]
+            team_2_3min["Gold_diff"] = team_2_3min["Gold"] - team_1_3min["Gold"]
+            
+            #The rest of the info is not available in the minute 1 data, so it has to be scarped minute by minute that why we iterate from 1 to 15 (15 minute is not taken into account, 15 is because how Python works)
+            for i in range(1, max_frame_index+1):
+
+                    #For each minute a list of events its presented, so we can iterate through each event and get necessary info
+                            for j in match_timeline["info"]["frames"][i]["events"]:
+
+                                #If the Killer ID is between 1 and 5 is corresponds to team1, if its bigger than 5 is for team2. This pattern is repeated through out the iteration of events
+                                if (j["type"] == "CHAMPION_KILL") and (1 <= j["killerId"] <= 5):
+                                    team_1_3min["Kills"] += 1
+                                    team_2_3min["Deaths"] += 1
+                                    try:
+                                        team_1_3min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                if (j["type"] == "CHAMPION_KILL") and (j["killerId"] > 5):
+                                    team_2_3min["Kills"] += 1
+                                    team_1_3min["Deaths"] += 1
+                                    try:
+                                        team_2_3min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                    
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 200):
+                                    team_1_3min["Towers"] += 1
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 100):
+                                    team_2_3min["Towers"] += 1 
+                                
+                                #Get Dragons and Heralds
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (1 <= j["killerId"] <= 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_1_3min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_1_3min["Heralds"] += 1
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_3min["Barons"] += 1
+                                    
+                                    
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (j["killerId"] > 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_2_3min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_2_3min["Heralds"] += 1    
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_3min["Barons"] += 1
+
+            if match_data["info"]["teams"][0]["win"]:
+                team_1_3min["Win"] = 1
+                team_2_3min["Win"] = 0
+            else:
+                team_1_3min["Win"] = 0
+                team_2_3min["Win"] = 1
+
+            team_1_3min_data = {
+                'Gold': team_1_3min["Gold"],
+                'Level': team_1_3min["Level"],
+                'Minions': team_1_3min["Minions"],
+                'Kills': team_1_3min["Kills"],
+                'Assists': team_1_3min["Assists"],
+                'Deaths': team_1_3min["Deaths"],
+                'Towers': team_1_3min["Towers"],
+                'Dragons': team_1_3min["Dragons"],
+                'Heralds': team_1_3min["Heralds"],
+                'Barons': team_1_3min["Barons"],
+                'Gold_diff': team_1_3min["Gold_diff"],
+                'Win': team_1_3min["Win"]
+            }
+
+            team_2_3min_data = {
+                'Gold': team_2_3min["Gold"],
+                'Level': team_2_3min["Level"],
+                'Minions': team_2_3min["Minions"],
+                'Kills': team_2_3min["Kills"],
+                'Assists': team_2_3min["Assists"],
+                'Deaths': team_2_3min["Deaths"],
+                'Towers': team_2_3min["Towers"],
+                'Dragons': team_2_3min["Dragons"],
+                'Heralds': team_2_3min["Heralds"],
+                'Barons': team_2_3min["Barons"],
+                'Gold_diff': team_2_3min["Gold_diff"],
+                'Win': team_2_3min["Win"]
+            }
+
+            combined_data[max_frame_index-1].append(team_1_3min_data)
+            combined_data[max_frame_index-1].append(team_2_3min_data)
         
         # if match is longer than 4 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 240 and match_data["info"]["gameDuration"] <=5400:
@@ -361,7 +459,7 @@ for _ in range(6):
             team_2_4min["Gold_diff"] = team_2_4min["Gold"] - team_1_4min["Gold"]
             
             #The rest of the info is not available in the minute 14 data, so it has to be scarped minute by minute that why we iterate from 1 to 15 (15 minute is not taken into account, 15 is because how Python works)
-            for i in range(1, 5):
+            for i in range(1, max_frame_index+1):
 
                     #For each minute a list of events its presented, so we can iterate through each event and get necessary info
                             for j in match_timeline["info"]["frames"][i]["events"]:
@@ -442,8 +540,8 @@ for _ in range(6):
                 'Win': team_2_4min["Win"]
             }
 
-            combined_data[3].append(team_1_4min_data)
-            combined_data[3].append(team_2_4min_data)
+            combined_data[max_frame_index-1].append(team_1_4min_data)
+            combined_data[max_frame_index-1].append(team_2_4min_data)
             
         # if match is longer than 14 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 840 and match_data["info"]["gameDuration"] <=5400:
@@ -482,7 +580,7 @@ for _ in range(6):
             team_2_14min["Gold_diff"] = team_2_14min["Gold"] - team_1_14min["Gold"]
             
             #The rest of the info is not available in the minute 14 data, so it has to be scarped minute by minute that why we iterate from 1 to 14
-            for i in range(1, 15):
+            for i in range(1, max_frame_index+1):
 
                     #For each minute a list of events its presented, so we can iterate through each event and get necessary info
                             for j in match_timeline["info"]["frames"][i]["events"]:
@@ -563,8 +661,8 @@ for _ in range(6):
                 'Win': team_2_14min["Win"]
             }
 
-            combined_data[13].append(team_1_14min_data)
-            combined_data[13].append(team_2_14min_data)
+            combined_data[max_frame_index-1].append(team_1_14min_data)
+            combined_data[max_frame_index-1].append(team_2_14min_data)
             
         # if match is longer than 28 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 1680 and match_data["info"]["gameDuration"] <=5400:
@@ -603,7 +701,7 @@ for _ in range(6):
             team_2_28min["Gold_diff"] = team_2_28min["Gold"] - team_1_28min["Gold"]
             
             #The rest of the info is not available in the minute 14 data, so it has to be scarped minute by minute that why we iterate from 1 to 14
-            for i in range(1, 29):
+            for i in range(1, max_frame_index+1):
 
                     #For each minute a list of events its presented, so we can iterate through each event and get necessary info
                             for j in match_timeline["info"]["frames"][i]["events"]:
@@ -685,8 +783,8 @@ for _ in range(6):
                 'Win': team_2_28min["Win"]
             }
 
-            combined_data[27].append(team_1_28min_data)
-            combined_data[27].append(team_2_28min_data)
+            combined_data[max_frame_index-1].append(team_1_28min_data)
+            combined_data[max_frame_index-1].append(team_2_28min_data)
             
         # if match is longer than 42 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 2520 and match_data["info"]["gameDuration"] <=5400:
@@ -725,7 +823,7 @@ for _ in range(6):
             team_2_42min["Gold_diff"] = team_2_42min["Gold"] - team_1_42min["Gold"]
             
             #The rest of the info is not available in the minute 14 data, so it has to be scarped minute by minute that why we iterate from 1 to 14
-            for i in range(1, 43):
+            for i in range(1, max_frame_index+1):
 
                     #For each minute a list of events its presented, so we can iterate through each event and get necessary info
                             for j in match_timeline["info"]["frames"][i]["events"]:
@@ -805,8 +903,8 @@ for _ in range(6):
                 'Win': team_2_42min["Win"]
             }
 
-            combined_data[41].append(team_1_42min_data)
-            combined_data[41].append(team_2_42min_data)
+            combined_data[max_frame_index-1].append(team_1_42min_data)
+            combined_data[max_frame_index-1].append(team_2_42min_data)
 
 
     # Update StartNumber and EndNumber for the next iteration
@@ -816,29 +914,9 @@ for _ in range(6):
     print()
 
     # Save the combined data to a CSV file
-    combined_df_1min = pd.DataFrame(combined_data[0])
-    combined_df_1min.to_csv(file_paths[0], index=False, mode='a', header=not os.path.exists(file_paths[0]))
-    
-    combined_df_2min = pd.DataFrame(combined_data[1])
-    combined_df_2min.to_csv(file_paths[1], index=False, mode='a', header=not os.path.exists(file_paths[1]))
-    
-    combined_df_3min = pd.DataFrame(combined_data[2])
-    combined_df_3min.to_csv(file_paths[2], index=False, mode='a', header=not os.path.exists(file_paths[2]))
-    
-    combined_df_4min = pd.DataFrame(combined_data[3])
-    combined_df_4min.to_csv(file_paths[3], index=False, mode='a', header=not os.path.exists(file_paths[3]))
-    
-    combined_df_5min = pd.DataFrame(combined_data[4])
-    combined_df_5min.to_csv(file_paths[4], index=False, mode='a', header=not os.path.exists(file_paths[4]))
-    
-    combined_df_14min = pd.DataFrame(combined_data[13])
-    combined_df_14min.to_csv(file_paths[13], index=False, mode='a', header=not os.path.exists(file_paths[13]))
-    
-    combined_df_28min = pd.DataFrame(combined_data[27])
-    combined_df_28min.to_csv(file_paths[27], index=False, mode='a', header=not os.path.exists(file_paths[27]))
-    
-    combined_df_42min = pd.DataFrame(combined_data[41])
-    combined_df_42min.to_csv(file_paths[41], index=False, mode='a', header=not os.path.exists(file_paths[41]))
-    
+    combined_data = [pd.DataFrame(combined_data[i]) for i in range(0, 45)]
+
+    for df, file_path in zip(combined_data, file_paths):
+        df.to_csv(file_path, index=False, mode='a', header=not os.path.exists(file_path))    
     
 time.sleep(600)
