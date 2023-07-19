@@ -26,9 +26,23 @@ puuid = player_info['puuid']
 
 file_paths = [f"{username}_team_data_{i}min.csv" for i in range(1, 45)]
 
+if os.path.exists(file_paths[0]):
+    os.remove(file_paths[0])
+    
+if os.path.exists(file_paths[1]):
+    os.remove(file_paths[1])
+    
+if os.path.exists(file_paths[2]):
+    os.remove(file_paths[2])
 
 if os.path.exists(file_paths[3]):
     os.remove(file_paths[3])
+    
+if os.path.exists(file_paths[4]):
+    os.remove(file_paths[4])
+
+if os.path.exists(file_paths[5]):
+    os.remove(file_paths[5])
 
 if os.path.exists(file_paths[13]):
     os.remove(file_paths[13])
@@ -70,6 +84,245 @@ for _ in range(6):
         responseMatchTimeline = requests.get(api_MatchTimeline)
         match_timeline = responseMatchTimeline.json()
         
+        # if match is longer than 1 minutes, then run the code
+        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 60 and match_data["info"]["gameDuration"] <=5400:
+
+            team_1_1min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+            team_2_1min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+
+            # Determine the minute that we are looking for
+            max_frame_index = 1
+            # Get the length of the frames in the match timeline
+            timeline_frames_length = len(match_timeline["info"]["frames"])
+            # Calculate the frame index, ensuring it does not exceed the maximum frame index
+            frame_index = min(max_frame_index, timeline_frames_length - 1)
+
+            for j in range(1, 6):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_1_1min["Gold"] += participant_frame["totalGold"]
+                    team_1_1min["Level"] += participant_frame["level"]
+                    team_1_1min["Minions"] += participant_frame["minionsKilled"]
+                    team_1_1min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            for j in range(6, 11):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_2_1min["Gold"] += participant_frame["totalGold"]
+                    team_2_1min["Level"] += participant_frame["level"]
+                    team_2_1min["Minions"] += participant_frame["minionsKilled"]
+                    team_2_1min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            team_1_1min["Level"] /= 5
+            team_2_1min["Level"] /= 5
+
+            team_1_1min["Gold_diff"] = team_1_1min["Gold"] - team_2_1min["Gold"]
+            team_2_1min["Gold_diff"] = team_2_1min["Gold"] - team_1_1min["Gold"]
+            
+            #The rest of the info is not available in the minute 1 data, so it has to be scarped minute by minute that why we iterate from 1 to 15 (15 minute is not taken into account, 15 is because how Python works)
+            for i in range(1, 2):
+
+                    #For each minute a list of events its presented, so we can iterate through each event and get necessary info
+                            for j in match_timeline["info"]["frames"][i]["events"]:
+
+                                #If the Killer ID is between 1 and 5 is corresponds to team1, if its bigger than 5 is for team2. This pattern is repeated through out the iteration of events
+                                if (j["type"] == "CHAMPION_KILL") and (1 <= j["killerId"] <= 5):
+                                    team_1_1min["Kills"] += 1
+                                    team_2_1min["Deaths"] += 1
+                                    try:
+                                        team_1_1min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                if (j["type"] == "CHAMPION_KILL") and (j["killerId"] > 5):
+                                    team_2_1min["Kills"] += 1
+                                    team_1_1min["Deaths"] += 1
+                                    try:
+                                        team_2_1min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                    
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 200):
+                                    team_1_1min["Towers"] += 1
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 100):
+                                    team_2_1min["Towers"] += 1 
+                                
+                                #Get Dragons and Heralds
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (1 <= j["killerId"] <= 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_1_1min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_1_1min["Heralds"] += 1
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_1min["Barons"] += 1
+                                    
+                                    
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (j["killerId"] > 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_2_1min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_2_1min["Heralds"] += 1    
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_1min["Barons"] += 1
+
+            if match_data["info"]["teams"][0]["win"]:
+                team_1_1min["Win"] = 1
+                team_2_1min["Win"] = 0
+            else:
+                team_1_1min["Win"] = 0
+                team_2_1min["Win"] = 1
+
+            team_1_1min_data = {
+                'Gold': team_1_1min["Gold"],
+                'Level': team_1_1min["Level"],
+                'Minions': team_1_1min["Minions"],
+                'Kills': team_1_1min["Kills"],
+                'Assists': team_1_1min["Assists"],
+                'Deaths': team_1_1min["Deaths"],
+                'Towers': team_1_1min["Towers"],
+                'Dragons': team_1_1min["Dragons"],
+                'Heralds': team_1_1min["Heralds"],
+                'Barons': team_1_1min["Barons"],
+                'Gold_diff': team_1_1min["Gold_diff"],
+                'Win': team_1_1min["Win"]
+            }
+
+            team_2_1min_data = {
+                'Gold': team_2_1min["Gold"],
+                'Level': team_2_1min["Level"],
+                'Minions': team_2_1min["Minions"],
+                'Kills': team_2_1min["Kills"],
+                'Assists': team_2_1min["Assists"],
+                'Deaths': team_2_1min["Deaths"],
+                'Towers': team_2_1min["Towers"],
+                'Dragons': team_2_1min["Dragons"],
+                'Heralds': team_2_1min["Heralds"],
+                'Barons': team_2_1min["Barons"],
+                'Gold_diff': team_2_1min["Gold_diff"],
+                'Win': team_2_1min["Win"]
+            }
+
+            combined_data[0].append(team_1_1min_data)
+            combined_data[0].append(team_2_1min_data)
+        
+        # if match is longer than 2 minutes, then run the code
+        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 120 and match_data["info"]["gameDuration"] <=5400:
+
+            team_1_2min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+            team_2_2min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+
+            # Determine the minute that we are looking for
+            max_frame_index = 2
+            # Get the length of the frames in the match timeline
+            timeline_frames_length = len(match_timeline["info"]["frames"])
+            # Calculate the frame index, ensuring it does not exceed the maximum frame index
+            frame_index = min(max_frame_index, timeline_frames_length - 1)
+
+            for j in range(1, 6):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_1_2min["Gold"] += participant_frame["totalGold"]
+                    team_1_2min["Level"] += participant_frame["level"]
+                    team_1_2min["Minions"] += participant_frame["minionsKilled"]
+                    team_1_2min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            for j in range(6, 11):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_2_2min["Gold"] += participant_frame["totalGold"]
+                    team_2_2min["Level"] += participant_frame["level"]
+                    team_2_2min["Minions"] += participant_frame["minionsKilled"]
+                    team_2_2min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            team_1_2min["Level"] /= 5
+            team_2_2min["Level"] /= 5
+
+            team_1_2min["Gold_diff"] = team_1_2min["Gold"] - team_2_2min["Gold"]
+            team_2_2min["Gold_diff"] = team_2_2min["Gold"] - team_1_2min["Gold"]
+            
+            #The rest of the info is not available in the minute 1 data, so it has to be scarped minute by minute that why we iterate from 1 to 15 (15 minute is not taken into account, 15 is because how Python works)
+            for i in range(1, 3):
+
+                    #For each minute a list of events its presented, so we can iterate through each event and get necessary info
+                            for j in match_timeline["info"]["frames"][i]["events"]:
+
+                                #If the Killer ID is between 1 and 5 is corresponds to team1, if its bigger than 5 is for team2. This pattern is repeated through out the iteration of events
+                                if (j["type"] == "CHAMPION_KILL") and (1 <= j["killerId"] <= 5):
+                                    team_1_2min["Kills"] += 1
+                                    team_2_2min["Deaths"] += 1
+                                    try:
+                                        team_1_2min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                if (j["type"] == "CHAMPION_KILL") and (j["killerId"] > 5):
+                                    team_2_2min["Kills"] += 1
+                                    team_1_2min["Deaths"] += 1
+                                    try:
+                                        team_2_2min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                    
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 200):
+                                    team_1_2min["Towers"] += 1
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 100):
+                                    team_2_2min["Towers"] += 1 
+                                
+                                #Get Dragons and Heralds
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (1 <= j["killerId"] <= 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_1_2min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_1_2min["Heralds"] += 1
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_2min["Barons"] += 1
+                                    
+                                    
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (j["killerId"] > 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_2_2min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_2_2min["Heralds"] += 1    
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_2min["Barons"] += 1
+
+            if match_data["info"]["teams"][0]["win"]:
+                team_1_2min["Win"] = 1
+                team_2_2min["Win"] = 0
+            else:
+                team_1_2min["Win"] = 0
+                team_2_2min["Win"] = 1
+
+            team_1_2min_data = {
+                'Gold': team_1_2min["Gold"],
+                'Level': team_1_2min["Level"],
+                'Minions': team_1_2min["Minions"],
+                'Kills': team_1_2min["Kills"],
+                'Assists': team_1_2min["Assists"],
+                'Deaths': team_1_2min["Deaths"],
+                'Towers': team_1_2min["Towers"],
+                'Dragons': team_1_2min["Dragons"],
+                'Heralds': team_1_2min["Heralds"],
+                'Barons': team_1_2min["Barons"],
+                'Gold_diff': team_1_2min["Gold_diff"],
+                'Win': team_1_2min["Win"]
+            }
+
+            team_2_2min_data = {
+                'Gold': team_2_2min["Gold"],
+                'Level': team_2_2min["Level"],
+                'Minions': team_2_2min["Minions"],
+                'Kills': team_2_2min["Kills"],
+                'Assists': team_2_2min["Assists"],
+                'Deaths': team_2_2min["Deaths"],
+                'Towers': team_2_2min["Towers"],
+                'Dragons': team_2_2min["Dragons"],
+                'Heralds': team_2_2min["Heralds"],
+                'Barons': team_2_2min["Barons"],
+                'Gold_diff': team_2_2min["Gold_diff"],
+                'Win': team_2_2min["Win"]
+            }
+
+            combined_data[1].append(team_1_2min_data)
+            combined_data[1].append(team_2_2min_data)
         
         # if match is longer than 4 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 240 and match_data["info"]["gameDuration"] <=5400:
