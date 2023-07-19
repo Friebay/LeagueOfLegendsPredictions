@@ -26,8 +26,7 @@ puuid = player_info['puuid']
 
 file_paths = [f"{username}_team_data_{i}min.csv" for i in range(1, 45)]
 
-for i in range(0, 44):
-    file_path = "file_path_{}".format(i)
+for file_path in file_paths:
     if os.path.exists(file_path):
         os.remove(file_path)
 
@@ -36,12 +35,12 @@ StartNumber = 0
 n=0
 
 # Perform the loop 6 times for 300 matches
-for _ in range(6):
+for _ in range(2):
     
     for _ in tqdm(range(100), desc="Gathering 50 matches", unit="seconds"):
         time.sleep(1.2 + random.uniform(0.005, 0.3))
 
-    combined_data = [[] for i in range(45)]
+    combined_data = [[] for i in range(46)]
 
     api_MatchHistory = "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids?start=" + str(StartNumber) + "&count=" + "50"
 
@@ -149,35 +148,8 @@ for _ in range(6):
                 team_1_1min["Win"] = 0
                 team_2_1min["Win"] = 1
 
-            team_1_1min_data = {
-                'Gold': team_1_1min["Gold"],
-                'Level': team_1_1min["Level"],
-                'Minions': team_1_1min["Minions"],
-                'Kills': team_1_1min["Kills"],
-                'Assists': team_1_1min["Assists"],
-                'Deaths': team_1_1min["Deaths"],
-                'Towers': team_1_1min["Towers"],
-                'Dragons': team_1_1min["Dragons"],
-                'Heralds': team_1_1min["Heralds"],
-                'Barons': team_1_1min["Barons"],
-                'Gold_diff': team_1_1min["Gold_diff"],
-                'Win': team_1_1min["Win"]
-            }
-
-            team_2_1min_data = {
-                'Gold': team_2_1min["Gold"],
-                'Level': team_2_1min["Level"],
-                'Minions': team_2_1min["Minions"],
-                'Kills': team_2_1min["Kills"],
-                'Assists': team_2_1min["Assists"],
-                'Deaths': team_2_1min["Deaths"],
-                'Towers': team_2_1min["Towers"],
-                'Dragons': team_2_1min["Dragons"],
-                'Heralds': team_2_1min["Heralds"],
-                'Barons': team_2_1min["Barons"],
-                'Gold_diff': team_2_1min["Gold_diff"],
-                'Win': team_2_1min["Win"]
-            }
+            team_1_1min_data = team_1_1min.copy()
+            team_2_1min_data = team_2_1min.copy()
 
             combined_data[max_frame_index-1].append(team_1_1min_data)
             combined_data[max_frame_index-1].append(team_2_1min_data)
@@ -269,35 +241,8 @@ for _ in range(6):
                 team_1_2min["Win"] = 0
                 team_2_2min["Win"] = 1
 
-            team_1_2min_data = {
-                'Gold': team_1_2min["Gold"],
-                'Level': team_1_2min["Level"],
-                'Minions': team_1_2min["Minions"],
-                'Kills': team_1_2min["Kills"],
-                'Assists': team_1_2min["Assists"],
-                'Deaths': team_1_2min["Deaths"],
-                'Towers': team_1_2min["Towers"],
-                'Dragons': team_1_2min["Dragons"],
-                'Heralds': team_1_2min["Heralds"],
-                'Barons': team_1_2min["Barons"],
-                'Gold_diff': team_1_2min["Gold_diff"],
-                'Win': team_1_2min["Win"]
-            }
-
-            team_2_2min_data = {
-                'Gold': team_2_2min["Gold"],
-                'Level': team_2_2min["Level"],
-                'Minions': team_2_2min["Minions"],
-                'Kills': team_2_2min["Kills"],
-                'Assists': team_2_2min["Assists"],
-                'Deaths': team_2_2min["Deaths"],
-                'Towers': team_2_2min["Towers"],
-                'Dragons': team_2_2min["Dragons"],
-                'Heralds': team_2_2min["Heralds"],
-                'Barons': team_2_2min["Barons"],
-                'Gold_diff': team_2_2min["Gold_diff"],
-                'Win': team_2_2min["Win"]
-            }
+            team_1_2min_data = team_1_2min.copy()
+            team_2_2min_data = team_2_2min.copy()
 
             combined_data[max_frame_index-1].append(team_1_2min_data)
             combined_data[max_frame_index-1].append(team_2_2min_data)
@@ -389,35 +334,8 @@ for _ in range(6):
                 team_1_3min["Win"] = 0
                 team_2_3min["Win"] = 1
 
-            team_1_3min_data = {
-                'Gold': team_1_3min["Gold"],
-                'Level': team_1_3min["Level"],
-                'Minions': team_1_3min["Minions"],
-                'Kills': team_1_3min["Kills"],
-                'Assists': team_1_3min["Assists"],
-                'Deaths': team_1_3min["Deaths"],
-                'Towers': team_1_3min["Towers"],
-                'Dragons': team_1_3min["Dragons"],
-                'Heralds': team_1_3min["Heralds"],
-                'Barons': team_1_3min["Barons"],
-                'Gold_diff': team_1_3min["Gold_diff"],
-                'Win': team_1_3min["Win"]
-            }
-
-            team_2_3min_data = {
-                'Gold': team_2_3min["Gold"],
-                'Level': team_2_3min["Level"],
-                'Minions': team_2_3min["Minions"],
-                'Kills': team_2_3min["Kills"],
-                'Assists': team_2_3min["Assists"],
-                'Deaths': team_2_3min["Deaths"],
-                'Towers': team_2_3min["Towers"],
-                'Dragons': team_2_3min["Dragons"],
-                'Heralds': team_2_3min["Heralds"],
-                'Barons': team_2_3min["Barons"],
-                'Gold_diff': team_2_3min["Gold_diff"],
-                'Win': team_2_3min["Win"]
-            }
+            team_1_3min_data = team_1_3min.copy()
+            team_2_3min_data = team_2_3min.copy()
 
             combined_data[max_frame_index-1].append(team_1_3min_data)
             combined_data[max_frame_index-1].append(team_2_3min_data)
@@ -510,38 +428,185 @@ for _ in range(6):
                 team_1_4min["Win"] = 0
                 team_2_4min["Win"] = 1
 
-            team_1_4min_data = {
-                'Gold': team_1_4min["Gold"],
-                'Level': team_1_4min["Level"],
-                'Minions': team_1_4min["Minions"],
-                'Kills': team_1_4min["Kills"],
-                'Assists': team_1_4min["Assists"],
-                'Deaths': team_1_4min["Deaths"],
-                'Towers': team_1_4min["Towers"],
-                'Dragons': team_1_4min["Dragons"],
-                'Heralds': team_1_4min["Heralds"],
-                'Barons': team_1_4min["Barons"],
-                'Gold_diff': team_1_4min["Gold_diff"],
-                'Win': team_1_4min["Win"]
-            }
-
-            team_2_4min_data = {
-                'Gold': team_2_4min["Gold"],
-                'Level': team_2_4min["Level"],
-                'Minions': team_2_4min["Minions"],
-                'Kills': team_2_4min["Kills"],
-                'Assists': team_2_4min["Assists"],
-                'Deaths': team_2_4min["Deaths"],
-                'Towers': team_2_4min["Towers"],
-                'Dragons': team_2_4min["Dragons"],
-                'Heralds': team_2_4min["Heralds"],
-                'Barons': team_2_4min["Barons"],
-                'Gold_diff': team_2_4min["Gold_diff"],
-                'Win': team_2_4min["Win"]
-            }
+            team_1_4min_data = team_1_4min.copy()
+            team_2_4min_data = team_2_4min.copy()
 
             combined_data[max_frame_index-1].append(team_1_4min_data)
             combined_data[max_frame_index-1].append(team_2_4min_data)
+            
+        # if match is longer than 5 minutes, then run the code
+        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 300 and match_data["info"]["gameDuration"] <=5400:
+
+            team_1_5min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+            team_2_5min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+
+            max_frame_index = 5
+            timeline_frames_length = len(match_timeline["info"]["frames"])
+            frame_index = min(max_frame_index, timeline_frames_length - 1)
+
+
+            for j in range(1, 6):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_1_5min["Gold"] += participant_frame["totalGold"]
+                    team_1_5min["Level"] += participant_frame["level"]
+                    team_1_5min["Minions"] += participant_frame["minionsKilled"]
+                    team_1_5min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            for j in range(6, 11):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_2_5min["Gold"] += participant_frame["totalGold"]
+                    team_2_5min["Level"] += participant_frame["level"]
+                    team_2_5min["Minions"] += participant_frame["minionsKilled"]
+                    team_2_5min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            team_1_5min["Level"] /= 5
+            team_2_5min["Level"] /= 5
+
+            team_1_5min["Gold_diff"] = team_1_5min["Gold"] - team_2_5min["Gold"]
+            team_2_5min["Gold_diff"] = team_2_5min["Gold"] - team_1_5min["Gold"]
+            
+            for i in range(1, max_frame_index+1):
+
+                    for j in match_timeline["info"]["frames"][i]["events"]:
+
+                                if (j["type"] == "CHAMPION_KILL") and (1 <= j["killerId"] <= 5):
+                                    team_1_5min["Kills"] += 1
+                                    team_2_5min["Deaths"] += 1
+                                    try:
+                                        team_1_5min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                if (j["type"] == "CHAMPION_KILL") and (j["killerId"] > 5):
+                                    team_2_5min["Kills"] += 1
+                                    team_1_5min["Deaths"] += 1
+                                    try:
+                                        team_2_5min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                    
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 200):
+                                    team_1_5min["Towers"] += 1
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 100):
+                                    team_2_5min["Towers"] += 1 
+                                
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (1 <= j["killerId"] <= 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_1_5min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_1_5min["Heralds"] += 1
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_5min["Barons"] += 1
+                                    
+                                    
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (j["killerId"] > 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_2_5min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_2_5min["Heralds"] += 1    
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_5min["Barons"] += 1
+
+            if match_data["info"]["teams"][0]["win"]:
+                team_1_5min["Win"] = 1
+                team_2_5min["Win"] = 0
+            else:
+                team_1_5min["Win"] = 0
+                team_2_5min["Win"] = 1
+
+            team_1_5min_data = team_1_5min.copy()
+            team_2_5min_data = team_2_5min.copy()
+
+            combined_data[max_frame_index-1].append(team_1_5min_data)
+            combined_data[max_frame_index-1].append(team_2_5min_data)
+            
+        # if match is longer than 6 minutes, then run the code
+        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 360 and match_data["info"]["gameDuration"] <=5400:
+
+            team_1_6min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+            team_2_6min = {"Gold": 0, "Level": 0, "Minions": 0, "Kills": 0, "Assists": 0, "Deaths": 0, "Towers": 0, "Dragons": 0, "Heralds": 0, "Barons": 0}
+
+            max_frame_index = 6
+            timeline_frames_length = len(match_timeline["info"]["frames"])
+            frame_index = min(max_frame_index, timeline_frames_length - 1)
+
+
+            for j in range(1, 6):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_1_6min["Gold"] += participant_frame["totalGold"]
+                    team_1_6min["Level"] += participant_frame["level"]
+                    team_1_6min["Minions"] += participant_frame["minionsKilled"]
+                    team_1_6min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            for j in range(6, 11):
+                participant_frame = match_timeline["info"]["frames"][frame_index]["participantFrames"].get(str(j))
+                if participant_frame is not None:
+                    team_2_6min["Gold"] += participant_frame["totalGold"]
+                    team_2_6min["Level"] += participant_frame["level"]
+                    team_2_6min["Minions"] += participant_frame["minionsKilled"]
+                    team_2_6min["Minions"] += participant_frame["jungleMinionsKilled"]
+
+            team_1_6min["Level"] /= 5
+            team_2_6min["Level"] /= 5
+
+            team_1_6min["Gold_diff"] = team_1_6min["Gold"] - team_2_6min["Gold"]
+            team_2_6min["Gold_diff"] = team_2_6min["Gold"] - team_1_6min["Gold"]
+            
+            for i in range(1, max_frame_index+1):
+
+                    for j in match_timeline["info"]["frames"][i]["events"]:
+
+                                if (j["type"] == "CHAMPION_KILL") and (1 <= j["killerId"] <= 5):
+                                    team_1_6min["Kills"] += 1
+                                    team_2_6min["Deaths"] += 1
+                                    try:
+                                        team_1_6min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                if (j["type"] == "CHAMPION_KILL") and (j["killerId"] > 5):
+                                    team_2_6min["Kills"] += 1
+                                    team_1_6min["Deaths"] += 1
+                                    try:
+                                        team_2_6min["Assists"] += len(j["assistingParticipantIds"])
+                                    except:
+                                        pass
+                                    
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 200):
+                                    team_1_6min["Towers"] += 1
+                                if (j["type"] == "BUILDING_KILL") and (j["teamId"] == 100):
+                                    team_2_6min["Towers"] += 1 
+                                
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (1 <= j["killerId"] <= 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_1_6min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_1_6min["Heralds"] += 1
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_6min["Barons"] += 1
+                                    
+                                    
+                                if (j["type"] == "ELITE_MONSTER_KILL") and (j["killerId"] > 5):
+                                    if j["monsterType"] == "DRAGON":
+                                        team_2_6min["Dragons"] += 1
+                                    elif j["monsterType"] == "RIFTHERALD":
+                                        team_2_6min["Heralds"] += 1    
+                                    elif j["monsterType"] == "BARON_NASHOR":
+                                        team_1_6min["Barons"] += 1
+
+            if match_data["info"]["teams"][0]["win"]:
+                team_1_6min["Win"] = 1
+                team_2_6min["Win"] = 0
+            else:
+                team_1_6min["Win"] = 0
+                team_2_6min["Win"] = 1
+
+            team_1_6min_data = team_1_6min.copy()
+            team_2_6min_data = team_2_6min.copy()
+
+            combined_data[max_frame_index-1].append(team_1_6min_data)
+            combined_data[max_frame_index-1].append(team_2_6min_data)
             
         # if match is longer than 14 minutes, then run the code
         if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 840 and match_data["info"]["gameDuration"] <=5400:
@@ -631,35 +696,8 @@ for _ in range(6):
                 team_1_14min["Win"] = 0
                 team_2_14min["Win"] = 1
 
-            team_1_14min_data = {
-                'Gold': team_1_14min["Gold"],
-                'Level': team_1_14min["Level"],
-                'Minions': team_1_14min["Minions"],
-                'Kills': team_1_14min["Kills"],
-                'Assists': team_1_14min["Assists"],
-                'Deaths': team_1_14min["Deaths"],
-                'Towers': team_1_14min["Towers"],
-                'Dragons': team_1_14min["Dragons"],
-                'Heralds': team_1_14min["Heralds"],
-                'Barons': team_1_14min["Barons"],
-                'Gold_diff': team_1_14min["Gold_diff"],
-                'Win': team_1_14min["Win"]
-            }
-
-            team_2_14min_data = {
-                'Gold': team_2_14min["Gold"],
-                'Level': team_2_14min["Level"],
-                'Minions': team_2_14min["Minions"],
-                'Kills': team_2_14min["Kills"],
-                'Assists': team_2_14min["Assists"],
-                'Deaths': team_2_14min["Deaths"],
-                'Towers': team_2_14min["Towers"],
-                'Dragons': team_2_14min["Dragons"],
-                'Heralds': team_2_14min["Heralds"],
-                'Barons': team_2_14min["Barons"],
-                'Gold_diff': team_2_14min["Gold_diff"],
-                'Win': team_2_14min["Win"]
-            }
+            team_1_14min_data = team_1_14min.copy()
+            team_2_14min_data = team_2_14min.copy()
 
             combined_data[max_frame_index-1].append(team_1_14min_data)
             combined_data[max_frame_index-1].append(team_2_14min_data)
@@ -753,35 +791,8 @@ for _ in range(6):
                 team_1_28min["Win"] = 0
                 team_2_28min["Win"] = 1
 
-            team_1_28min_data = {
-                'Gold': team_1_28min["Gold"],
-                'Level': team_1_28min["Level"],
-                'Minions': team_1_28min["Minions"],
-                'Kills': team_1_28min["Kills"],
-                'Assists': team_1_28min["Assists"],
-                'Deaths': team_1_28min["Deaths"],
-                'Towers': team_1_28min["Towers"],
-                'Dragons': team_1_28min["Dragons"],
-                'Heralds': team_1_28min["Heralds"],
-                'Barons': team_1_28min["Barons"],
-                'Gold_diff': team_1_28min["Gold_diff"],
-                'Win': team_1_28min["Win"]
-            }
-
-            team_2_28min_data = {
-                'Gold': team_2_28min["Gold"],
-                'Level': team_2_28min["Level"],
-                'Minions': team_2_28min["Minions"],
-                'Kills': team_2_28min["Kills"],
-                'Assists': team_2_28min["Assists"],
-                'Deaths': team_2_28min["Deaths"],
-                'Towers': team_2_28min["Towers"],
-                'Dragons': team_2_28min["Dragons"],
-                'Heralds': team_2_28min["Heralds"],
-                'Barons': team_2_28min["Barons"],
-                'Gold_diff': team_2_28min["Gold_diff"],
-                'Win': team_2_28min["Win"]
-            }
+            team_1_28min_data = team_1_28min.copy()
+            team_2_28min_data = team_2_28min.copy()
 
             combined_data[max_frame_index-1].append(team_1_28min_data)
             combined_data[max_frame_index-1].append(team_2_28min_data)
@@ -873,35 +884,8 @@ for _ in range(6):
                 team_1_42min["Win"] = 0
                 team_2_42min["Win"] = 1
 
-            team_1_42min_data = {
-                'Gold': team_1_42min["Gold"],
-                'Level': team_1_42min["Level"],
-                'Minions': team_1_42min["Minions"],
-                'Kills': team_1_42min["Kills"],
-                'Assists': team_1_42min["Assists"],
-                'Deaths': team_1_42min["Deaths"],
-                'Towers': team_1_42min["Towers"],
-                'Dragons': team_1_42min["Dragons"],
-                'Heralds': team_1_42min["Heralds"],
-                'Barons': team_1_42min["Barons"],
-                'Gold_diff': team_1_42min["Gold_diff"],
-                'Win': team_1_42min["Win"]
-            }
-
-            team_2_42min_data = {
-                'Gold': team_2_42min["Gold"],
-                'Level': team_2_42min["Level"],
-                'Minions': team_2_42min["Minions"],
-                'Kills': team_2_42min["Kills"],
-                'Assists': team_2_42min["Assists"],
-                'Deaths': team_2_42min["Deaths"],
-                'Towers': team_2_42min["Towers"],
-                'Dragons': team_2_42min["Dragons"],
-                'Heralds': team_2_42min["Heralds"],
-                'Barons': team_2_42min["Barons"],
-                'Gold_diff': team_2_42min["Gold_diff"],
-                'Win': team_2_42min["Win"]
-            }
+            team_1_42min_data = team_1_42min.copy()
+            team_2_42min_data = team_2_42min.copy()
 
             combined_data[max_frame_index-1].append(team_1_42min_data)
             combined_data[max_frame_index-1].append(team_2_42min_data)
