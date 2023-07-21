@@ -132,7 +132,6 @@ for _ in range(2):
                                     elif j["monsterType"] == "BARON_NASHOR":
                                         team_1_1min["Barons"] += 1
                                     
-                                    
                                 if (j["type"] == "ELITE_MONSTER_KILL") and (j["killerId"] > 5):
                                     if j["monsterType"] == "DRAGON":
                                         team_2_1min["Dragons"] += 1
