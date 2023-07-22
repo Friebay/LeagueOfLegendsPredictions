@@ -119,7 +119,7 @@ StartNumber = 0
 n=0
 
 # Perform the loop 6 times for 300 matches
-for _ in range(2):
+for _ in range(6):
     
     for _ in tqdm(range(100), desc="Gathering 50 matches", unit="seconds"):
         time.sleep(1.2 + random.uniform(0.005, 0.3))
@@ -145,97 +145,25 @@ for _ in range(2):
         responseMatchTimeline = requests.get(api_MatchTimeline)
         match_timeline = responseMatchTimeline.json()
         
-        # if match is longer than 1 minutes, then run the code
-        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 60 and match_data["info"]["gameDuration"] <=5400:
-            
-            minutes = 1
-            team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
-            
-            combined_data[minutes-1].append(team_1_stats)
-            combined_data[minutes-1].append(team_2_stats)
         
-        # if match is longer than 2 minutes, then run the code
-        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 120 and match_data["info"]["gameDuration"] <=5400:
+        for minutes in range (1, 45):
+            # if match is longer than 1 minutes, then run the code
+            if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= minutes*60 and match_data["info"]["gameDuration"] <=5400:
 
-            minutes = 2
-            team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
+                team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
             
-            combined_data[minutes-1].append(team_1_stats)
-            combined_data[minutes-1].append(team_2_stats)
-        
-        # if match is longer than 3 minutes, then run the code
-        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 180 and match_data["info"]["gameDuration"] <=5400:
-
-            minutes = 3
-            team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
-            
-            combined_data[minutes-1].append(team_1_stats)
-            combined_data[minutes-1].append(team_2_stats)
-        
-        # if match is longer than 4 minutes, then run the code
-        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 240 and match_data["info"]["gameDuration"] <=5400:
-
-            minutes = 4
-            team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
-            
-            combined_data[minutes-1].append(team_1_stats)
-            combined_data[minutes-1].append(team_2_stats)
-            
-        # if match is longer than 5 minutes, then run the code
-        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 300 and match_data["info"]["gameDuration"] <=5400:
-
-            minutes = 5
-            team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
-            
-            combined_data[minutes-1].append(team_1_stats)
-            combined_data[minutes-1].append(team_2_stats)
-            
-        # if match is longer than 6 minutes, then run the code
-        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 360 and match_data["info"]["gameDuration"] <=5400:
-
-            minutes = 6
-            team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
-            
-            combined_data[minutes-1].append(team_1_stats)
-            combined_data[minutes-1].append(team_2_stats)
-            
-        # if match is longer than 14 minutes, then run the code
-        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 840 and match_data["info"]["gameDuration"] <=5400:
-
-            minutes = 14
-            team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
-            
-            combined_data[minutes-1].append(team_1_stats)
-            combined_data[minutes-1].append(team_2_stats)
-            
-        # if match is longer than 28 minutes, then run the code
-        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 1680 and match_data["info"]["gameDuration"] <=5400:
-
-            minutes = 28
-            team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
-            
-            combined_data[minutes-1].append(team_1_stats)
-            combined_data[minutes-1].append(team_2_stats)
-            
-        # if match is longer than 42 minutes, then run the code
-        if match_data["info"]["gameMode"] == "CLASSIC" and match_data["info"]["gameDuration"] >= 2520 and match_data["info"]["gameDuration"] <=5400:
-
-            minutes = 42
-            team_1_stats, team_2_stats = get_minute_stats(minutes, match_timeline, match_data)
-            
-            combined_data[minutes-1].append(team_1_stats)
-            combined_data[minutes-1].append(team_2_stats)
-
-    # Update StartNumber and EndNumber for the next iteration
-    StartNumber += 50
-    n=n+1
-    print("Loop", n)
-    print()
+                combined_data[minutes-1].append(team_1_stats)
+                combined_data[minutes-1].append(team_2_stats)
 
     # Save the combined data to a CSV file
     combined_data = [pd.DataFrame(combined_data[i]) for i in range(0, 46)]
 
     for df, file_path in zip(combined_data, file_paths):
-        df.to_csv(file_path, index=False, mode='a', header=not os.path.exists(file_path))    
-    
+        df.to_csv(file_path, index=False, mode='a', header=not os.path.exists(file_path))  
+        
+    StartNumber += 50
+    n=n+1
+    print("Loop", n)
+    print()
+
 time.sleep(600)
